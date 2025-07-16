@@ -62,12 +62,21 @@
 
       window.addEventListener('load', () => {
         const scene = document.querySelector('a-scene');
-        // Detecta si se está corriendo en un dispositivo XR (por userAgent como aproximación)
-        const isVRBrowser = navigator.userAgent.toLowerCase().includes('quest') || navigator.xr;
-        if (isVRBrowser && scene && scene.enterVR) {
-          scene.enterVR();
-          const vrBtn = document.getElementById('vrButton');
-          if (vrBtn) vrBtn.style.display = 'none';
+        const vrBtn = document.getElementById('vrButton');
+
+        if (navigator.xr) {
+          navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
+            if (supported && scene && scene.enterVR) {
+              // Si el navegador XR soporta modo VR, esperamos interacción del usuario
+              vrBtn.style.display = 'block';
+            } else {
+              // Si no está en un entorno XR o no soporta, ocultamos el botón
+              vrBtn.style.display = 'none';
+            }
+          });
+        } else {
+          // No hay XR disponible
+          vrBtn.style.display = 'none';
         }
       });
     </script>
@@ -77,7 +86,7 @@
       <a-sky id="panorama" src="4AMB360_1-100.jpg" rotation="0 -90 0"></a-sky>
     </a-scene>
 
-    <button id="vrButton" onclick="iniciarVR()">Iniciar VR</button>
+    <button id="vrButton" onclick="iniciarVR()">Ingresar a VR</button>
 
     <div id="thumbnails">
       <img class="thumb" src="4AMB360_1-100.jpg" onclick="cambiarPanorama('4AMB360_1-100.jpg')" alt="Vista 1" />
