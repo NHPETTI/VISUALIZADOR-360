@@ -2,13 +2,14 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Visualizador 360 con Miniaturas</title>
+    <title>Visualizador 360 VR - Vercel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <style>
       body {
         margin: 0;
         overflow: hidden;
+        font-family: sans-serif;
       }
       #thumbnails {
         position: absolute;
@@ -18,6 +19,7 @@
         justify-content: center;
         gap: 10px;
         z-index: 10;
+        pointer-events: auto;
       }
       .thumb {
         width: 100px;
@@ -31,18 +33,51 @@
       .thumb:hover {
         transform: scale(1.1);
       }
+      #vrButton {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #1b3154;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        z-index: 10;
+      }
     </style>
     <script>
       function cambiarPanorama(nombreArchivo) {
         const panorama = document.querySelector("#panorama");
         panorama.setAttribute("src", nombreArchivo);
       }
+
+      function iniciarVR() {
+        const scene = document.querySelector('a-scene');
+        if (scene && scene.enterVR) {
+          scene.enterVR();
+        }
+      }
+
+      window.addEventListener('load', () => {
+        const scene = document.querySelector('a-scene');
+        // Detecta si se está corriendo en un dispositivo XR (por userAgent como aproximación)
+        const isVRBrowser = navigator.userAgent.toLowerCase().includes('quest') || navigator.xr;
+        if (isVRBrowser && scene && scene.enterVR) {
+          scene.enterVR();
+          const vrBtn = document.getElementById('vrButton');
+          if (vrBtn) vrBtn.style.display = 'none';
+        }
+      });
     </script>
   </head>
   <body>
-    <a-scene vr-mode-ui="enabled: true" embedded>
+    <a-scene embedded vr-mode-ui="enabled: false" xr-mode-ui="enabled: false">
       <a-sky id="panorama" src="4AMB360_1-100.jpg" rotation="0 -90 0"></a-sky>
     </a-scene>
+
+    <button id="vrButton" onclick="iniciarVR()">Iniciar VR</button>
 
     <div id="thumbnails">
       <img class="thumb" src="4AMB360_1-100.jpg" onclick="cambiarPanorama('4AMB360_1-100.jpg')" alt="Vista 1" />
